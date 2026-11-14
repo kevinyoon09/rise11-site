@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="pt-BR" data-type="software" data-radius="soft" data-ground="pitch" data-buttons="tonal" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rise Eleven: peneiras de futebol de base no app</title>
+<meta name="description" content="Rise Eleven conecta clubes e jogadores de futebol de base no Brasil: clubes publicam peneiras, jogadores se inscrevem e mostram seus vídeos.">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<style>
+:root {
+  --p-bg: #0b0b0c; --p-surface: #151517; --p-ink: #f1f1f2; --p-muted: #b6b6bb;
+  --p-accent: #F26B2C; --p-accent-ink: #1c0a02; --p-action: #F26B2C; --p-action-ink: #1c0a02;
+  --p-inv-bg: #f1f1f2; --p-inv-surface: #ffffff; --p-inv-ink: #0b0b0c; --p-inv-muted: #55555b;
+  --p-inv-accent: #C2410C; --p-inv-accent-ink: #ffffff; --p-inv-action: #C2410C; --p-inv-action-ink: #ffffff;
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
+  --font-text: "Barlow", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.005em;
+  --display-tracking-xl: -0.01em;
+  --ly-scale: 1.04;
+}
+/* the lit ground behind UI panels and the closing band: the pitch */
+html[data-ground="pitch"] { --ground-bg: #2a2a2e; --ground-surface: #333338; --ground-ink: #f4f4f5; --ground-muted: #d4d4d8; --ground-accent: #FFA26B; }
+/* the closing band: a deeper pitch, so its white text reads at 7:1 */
+html[data-ground="pitch"] .footer--statement { --ground-bg: #1a1a1d; --ground-surface: #222226; --ground-muted: #dcdce0; }
+</style>
+<link rel="stylesheet" href="assets/ui/base.css">
+<link rel="stylesheet" href="assets/ui/window/fragment.css">
+<link rel="stylesheet" href="assets/ui/chat/fragment.css">
+<link rel="stylesheet" href="assets/ui/search/fragment.css">
+<link rel="stylesheet" href="assets/ui/notify/fragment.css">
+<link rel="stylesheet" href="assets/ui/checklist/fragment.css">
+<link rel="stylesheet" href="assets/ui/toggles/fragment.css">
+<script src="assets/backgrounds/backgrounds.js"></script>
+<!-- page CSS: inside visuals only (the hero collage, the app frame), one --p-h for the card group -->
+<style>
+  /* the RISE11 wordmark (from the brief's brand page) */
+  .wordmark { font: 600 24px/1 var(--font-display); letter-spacing: .01em; color: var(--ink); }
+  .wordmark b { font-weight: inherit; color: var(--accent); }
+  :root { --frag: #17171a; }
+  .close__word b { font-weight: inherit; color: var(--ground-accent); }
+  h1, h2, .close__word { font-weight: 500; }
+
+  /* hero: the two app screens from the brief (modo jogador, modo olheiro), as dark phones on the collage */
+  .ly-collage { container-type: inline-size; }
+  /* phones keep a 19.5:9 screen at any size: as wide as fits both the width and the height of the collage */
+  .ly-collage__set { container-type: size; display: flex; align-items: center; justify-content: center; gap: 4cqw; }
+  .ly-collage .ly-piece.ph { position: relative; flex: none; width: min(45cqw, calc(94cqh * 9 / 19.5)); height: auto; aspect-ratio: 9 / 19.5; }
+  /* the phones show the real app: colors from src/constants/theme.ts, system font, logo weight 900 */
+  .ly-collage .ly-piece.ph, .ph-stage .ph { --app-bg: #0B0F14; --app-el: #141A21; --app-sel: #1E262F; --app-text: #F2F4F7; --app-muted: #8B95A1; --app-border: #232B34; --app-primary: #F26B2C; --app-on-primary: #FFFFFF;
+    --accent: var(--app-primary); --accent-ink: var(--app-on-primary); background: #060607; color: var(--app-text); border-radius: 6cqw; padding: 1.6cqw; border: 1px solid #27272b;
+    box-shadow: 0 1px 2px rgb(0 0 0 / .4), 0 30px 60px -24px rgb(0 0 0 / .8); font: 400 max(13px, 2.1cqw)/1.35 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; }
+  .ph__screen { height: 100%; border-radius: 4.6cqw; background: var(--app-bg); overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; }
+  .ph__top { display: flex; align-items: center; justify-content: space-between; padding: 4cqw 4cqw 2.4cqw; }
+  .ph__top .wordmark { font-family: inherit; font-weight: 900; font-size: max(14px, 3.6cqw); line-height: 1; letter-spacing: -0.02em; color: var(--app-text); }
+  .ph__top small { display: block; font: 600 max(13px, 1.7cqw)/1.2 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; letter-spacing: .04em; color: var(--accent); }
+  .ph__top strong { font: 800 max(15px, 4cqw)/1.1 inherit; font-family: inherit; }
+  .ph__icons { display: flex; gap: 1.6cqw; }
+  .ph__icons i { width: 5cqw; height: 5cqw; border-radius: 50%; border: 1px solid var(--app-border); }
+  .ph__body { padding: 0 3.4cqw; display: grid; gap: 2.4cqw; align-content: start; overflow: hidden; }
+  .ph-card { background: var(--app-el); border: 1px solid var(--app-border); border-radius: 2.6cqw; padding: 2.6cqw; display: grid; gap: 1.6cqw; }
+  .ph-card b, .ph-row b { font-weight: 600; }
+  .ph-card small, .ph-row small { color: var(--app-muted); font-size: max(13px, 1.7cqw); }
+  .ph-card em { font-style: normal; color: var(--accent); font-weight: 600; }
+  .ph-who { display: flex; align-items: center; gap: 2cqw; }
+  .ph-av { width: 6cqw; height: 6cqw; border-radius: 50%; background: var(--app-sel); flex: none; display: grid; place-items: center; font: 600 max(12px, 1.7cqw)/1 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; color: var(--app-text); }
+  .ph-av--club { background: var(--accent); color: var(--accent-ink); }
+  .ph-video { position: relative; aspect-ratio: 16 / 10; border-radius: 1.8cqw; background: var(--app-sel); overflow: hidden; }
+  .ph-video::before { content: ""; position: absolute; inset: 8% 6%; border: 1.5px solid rgb(255 255 255 / .4); border-radius: 1cqw; }
+  .ph-video::after { content: ""; position: absolute; left: 50%; top: 8%; bottom: 8%; border-left: 1.5px solid rgb(255 255 255 / .4); }
+  .ph-video span { position: absolute; z-index: 1; left: 50%; top: 50%; width: 9cqw; height: 9cqw; transform: translate(-50%, -50%); border-radius: 50%; background: #fff; display: grid; place-items: center; }
+  .ph-video span svg { width: 38%; height: 38%; margin-left: 8%; }
+  .ph-video small { position: absolute; z-index: 1; left: 2.4cqw; bottom: 2cqw; color: #fff; font-weight: 600; }
+  .ph-search { border: 1px solid var(--app-border); border-radius: 99px; padding: 1.6cqw 2.6cqw; color: var(--app-muted); }
+  .ph-chips { display: flex; flex-wrap: wrap; gap: 1.2cqw; }
+  .ph-chips span { border: 1px solid var(--app-border); border-radius: 99px; padding: .6cqw 2cqw; }
+  .ph-chips span.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .ph-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 2cqw; background: var(--app-el); border: 1px solid var(--app-border); border-radius: 2.6cqw; padding: 2.2cqw 2.6cqw; }
+  .ph-row .n { text-align: right; color: var(--accent); font-weight: 600; line-height: 1.1; }
+  .ph-row .n small { display: block; font-weight: 400; }
+  .ph__tabs { display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; column-gap: .8cqw; padding: 2.4cqw 1.2cqw 3cqw; background: var(--app-el); border-top: 1px solid var(--app-border); color: var(--app-muted); font-size: max(10px, 1.35cqw); text-align: center; }
+  .ph__tabs--4 { grid-template-columns: repeat(4, 1fr); }
+  .ph__tabs span.on { color: var(--accent); font-weight: 600; }
+  .ph__tabs .rec { justify-self: center; width: 9cqw; height: 9cqw; margin-top: -5cqw; border-radius: 50%; background: var(--accent); display: grid; place-items: center; box-shadow: 0 0 0 1.2cqw var(--app-bg); }
+  .ph__tabs .rec svg { width: 45%; height: 45%; }
+  /* phone: the player screen alone, wide enough for its text */
+  @media (max-width: 1023px) { .ph-card + .ph-card, .ph-row:last-child { display: none; } }
+  /* Oswald's tall line box: drop the right column to the h2's cap line */
+  #peneiras .grid > p.start-7 { margin-top: 10px; }
+  #perguntas .faq { margin-top: 12px; }
+  @media (max-width: 639px) { .ly-piece.ph:nth-child(2) { display: none; } .ly-collage .ly-piece.ph:first-child { width: min(80cqw, calc(94cqh * 9 / 19.5)); }
+    /* tall enough for one phone at 80% of the width */
+    .hero--triptych .ly-collage { min-height: calc((100vw - 2 * var(--gut, 24px)) * .8 * 19.5 / 9 / .94); } }
+
+  /* app-frame (sections-library.md, app-frame) */
+  .app.ui { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin-top: var(--s-7); background: var(--u-bg); border: 1px solid var(--u-border); border-radius: var(--u-r); box-shadow: var(--u-shadow); }
+  .app > .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+  .app > .app__pane + .app__pane { border-left: 1px solid var(--u-line); }
+  .app > .app__pane > .ui-panel { width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+  .app > .app__pane::after { content: ""; position: absolute; inset: auto 0 0 0; height: 64px; background: linear-gradient(transparent, var(--u-bg)); pointer-events: none; }
+  @media (min-width: 1024px) and (max-width: 1279px) { .app.ui { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); } }
+  @media (max-width: 1023px) {
+    .app.ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .app > .app__pane--list { max-height: 252px; }
+    .app > .app__pane--list::after { display: none; }
+    .app .ui-win__side { display: none; }
+    .app .ui-win__body { grid-template-columns: minmax(0, 1fr); }
+    .app > .app__pane + .app__pane { border-left: 0; border-top: 1px solid var(--u-line); }
+  }
+  @media (max-width: 639px) {
+    .app.ui { grid-template-rows: minmax(0, 1fr); }
+    .app > .app__pane--list { display: none; }
+    .app > .app__pane + .app__pane { border-top: 0; }
+  }
+
+  #recursos .panel { --p-h: 336px; }
+  .hero--triptych .hero__cta .btn { height: var(--btn-h); font-size: var(--t-body); }
+  .closing .close--word .close__word { font-size: min(calc((100vw - 2 * var(--gut)) / 5.4), 230px); white-space: nowrap; line-height: 1.12; padding-top: .06em; }
+  @media (max-width: 639px) { #recursos .panel { --p-h: 168px; } }
+
+  /* como-funciona (moment pinned-chapters): each step's visual is one app screen in a 19.5:9 phone.
+     The stage is a container 1/.45 of the phone, so the phone's cqw sizes match the hero's phones. */
+  .mo-pc__visual--lit { container-type: size; }
+  .ph-stage { container-type: inline-size; flex: none; width: calc(min(70cqw, 90cqh * 9 / 19.5) / .45); display: flex; justify-content: center; }
+  .ph-stage .ph { width: 45cqw; aspect-ratio: 9 / 19.5; overflow: hidden; }
+  /* a frame tall enough for the phone to read at the hero phones' size */
+  /* (main first: moment.css loads after this sheet with the same selectors) */
+  main [data-moment="pinned-chapters"] .mo-pc__visual.mo-pc__visual--lit { aspect-ratio: 4 / 5; }
+  main [data-moment="pinned-chapters"].is-live .mo-pc__visuals { aspect-ratio: 4 / 5; }
+  main [data-moment="pinned-chapters"].is-live .mo-pc__visual.mo-pc__visual--lit { aspect-ratio: auto; }
+  @media (max-width: 639px) {
+    main [data-moment="pinned-chapters"] .mo-pc__visual.mo-pc__visual--lit { aspect-ratio: 1 / 2; }
+    .mo-pc__visual--lit .ph-stage { width: calc(min(84cqw, 92cqh * 9 / 19.5) / .45); }
+  }
+  .ph-hero { grid-template-columns: auto 1fr; align-items: center; }
+  .ph-av--lg { width: 11cqw; height: 11cqw; font-size: max(13px, 2.6cqw); }
+  .ph-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6cqw; }
+  .ph-stats span { display: grid; gap: .4cqw; background: var(--app-el); border: 1px solid var(--app-border); border-radius: 2.6cqw; padding: 2cqw; }
+  .ph-stats small, .ph-field > small { color: var(--app-muted); font-size: max(12px, 1.6cqw); }
+  .ph-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2cqw; }
+  .ph-thumbs i { aspect-ratio: 9 / 12; border-radius: 1.6cqw; background: var(--app-sel); }
+  .ph-btn { display: block; text-align: center; border-radius: 99px; padding: 2cqw; background: var(--app-primary); color: var(--app-on-primary); font-weight: 700; }
+  .ph-btn--outline { background: none; color: var(--app-text); border: 1px solid var(--app-border); }
+  .ph-field { display: grid; gap: 1cqw; }
+  .ph-input { display: block; border: 1px solid var(--app-border); background: var(--app-el); border-radius: 2cqw; padding: 2cqw 2.4cqw; }
+  .ph-badge { margin-left: auto; align-self: center; border-radius: 99px; padding: .6cqw 2cqw; background: var(--app-sel); color: var(--app-primary); font-weight: 700; font-size: max(12px, 1.6cqw); }
+  .ph-msg { max-width: 82%; justify-self: start; background: var(--app-el); border: 1px solid var(--app-border); border-radius: 3cqw 3cqw 3cqw 1cqw; padding: 2cqw 2.6cqw; }
+  .ph-msg--me { justify-self: end; background: var(--app-primary); border-color: var(--app-primary); color: var(--app-on-primary); border-radius: 3cqw 3cqw 1cqw 3cqw; }
+</style>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="assets/moments/moments.js"><link rel="modulepreload" href="assets/moments/lib.js"><link rel="modulepreload" href="assets/moments/pinned-chapters/moment.js">
+</head>
+<body>
+<!-- type: software (an app for clubs and youth football players)
+     deal: hero triptych, nav nav-centre (dealt nav-cards: no photographs for its panel, so re-dealt to nav-centre),
+     close close-word, footer footer-statement, rhythm space, buttons tonal, mark arc, ground sky, palette white-signal-red, type funnel
+     effect: none (left out on purpose; the hero collage is the one timed loop); moments: none; scene: none
+     plan: hero (1) · peneiras app-frame (1) · perguntas faq (1) · recursos features-2x2 (2, .g2) · footer.closing (1) -->
+
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="nav__logo" href="#top"><span class="wordmark" aria-label="Rise Eleven">RISE<b>11</b></span></a>
+    <nav class="nav__links" aria-label="Principal">
+      <div class="nav__item"><a class="nav__link" href="#peneiras">Peneiras</a></div>
+      <div class="nav__item"><a class="nav__link" href="#recursos">Recursos</a></div>
+      <div class="nav__item"><a class="nav__link" href="#seguranca">Segurança</a></div>
+      <div class="nav__item"><a class="nav__link" href="#perguntas">Perguntas</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary" href="https://rise-eleven.expo.app">Abrir o app</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero hero--triptych" aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text grid hero__grid">
+      <div class="span-3">
+        <h1 id="hero-h">Peneiras de futebol de base no app</h1>
+        <p class="hero__lead">Jogadores mostram vídeos jogando, e menores de 18 anos entram com autorização do responsável. Clubes e olheiros encontram talentos e publicam peneiras verificadas. Grátis no lançamento.</p>
+      </div>
+      <div class="ly-collage span-6 start-4" role="img" aria-label="Duas telas do Rise Eleven: o modo jogador, com vídeo de jogada e uma peneira aberta verificada pelo clube, e o modo olheiro, com a busca de atletas por posição, categoria e estado">
+        <div class="ly-collage__set is-on">
+          <div class="ly-piece ph">
+            <div class="ph__screen">
+              <div class="ph__top"><span class="wordmark">RISE<b>11</b></span><span class="ph__icons"><i></i><i></i></span></div>
+              <div class="ph__body">
+                <div class="ph-card">
+                  <div class="ph-who"><span class="ph-av">MS</span><span><b>Miguel Santos</b><br><small>Centroavante · Campinas, SP</small></span></div>
+                  <div class="ph-video"><span><svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z" fill="#0b0b0c"/></svg></span><small>0:42 · Finalização</small></div>
+                  <span><em>Novo vídeo.</em> Treino de finalização de curta distância.</span>
+                </div>
+                <div class="ph-card">
+                  <div class="ph-who"><span class="ph-av ph-av--club">EC</span><span><b>Peneira EC Jardim</b><br><small>Sáb, 14 dez · 08:00</small></span></div>
+                  <span><em>Peneira aberta.</em> Sub-15, atacantes e laterais. Verificada pela organização do clube.</span>
+                </div>
+              </div>
+              <div class="ph__tabs" aria-hidden="true"><span class="on">Início</span><span>Peneiras</span><span class="rec"><svg viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"><rect x="1.5" y="4" width="9" height="8" rx="1.5"/><path d="m10.5 7 4-2.2v6.4l-4-2.2z"/></svg></span><span>Mensagens</span><span>Perfil</span></div>
+            </div>
+          </div>
+          <div class="ly-piece ph">
+            <div class="ph__screen">
+              <div class="ph__top"><span><small>Modo olheiro</small><strong>Buscar atletas</strong></span></div>
+              <div class="ph__body">
+                <div class="ph-search">Nome, posição, cidade</div>
+                <div class="ph-chips"><span class="on">Centroavante</span><span>Sub-15</span><span>SP</span></div>
+                <div class="ph-row"><span class="ph-av">MS</span><span><b>Miguel Santos</b><br><small>1,68 m · Campinas</small></span><span class="n">3<small>vídeos</small></span></div>
+                <div class="ph-row"><span class="ph-av">GA</span><span><b>Gabriel Alves</b><br><small>1,71 m · Hortolândia</small></span><span class="n">5<small>vídeos</small></span></div>
+                <div class="ph-row"><span class="ph-av">BR</span><span><b>Bruno Ribeiro</b><br><small>1,74 m · Indaiatuba</small></span><span class="n">2<small>vídeos</small></span></div>
+                <div class="ph-row"><span class="ph-av">DS</span><span><b>Davi Souza</b><br><small>1,69 m · Campinas</small></span><span class="n">4<small>vídeos</small></span></div>
+              </div>
+              <div class="ph__tabs" aria-hidden="true"><span class="on">Buscar</span><span>Favoritos</span><span>Mensagens</span><span>Peneiras</span><span>Perfil</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="span-3 start-10 hero__cta"><a class="btn btn--primary" href="#como-funciona">Ver como funciona<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a></div>
+    </div></div>
+  </section>
+
+  <section class="section" id="como-funciona" style="--h: 2" data-moment="pinned-chapters" aria-labelledby="como-h">
+    <div class="wrap mo-pc__grid">
+      <div class="mo-pc__text">
+        <h2 id="como-h">Do perfil ao contato do clube</h2>
+        <ol class="mo-pc__steps">
+          <li class="mo-pc__step">
+            <h3>Monte seu perfil de atleta</h3>
+            <p>Posição, altura, peso e cidade. Com o perfil pronto, o app mostra as peneiras da sua categoria.</p>
+            <figure class="mo-pc__visual mo-pc__visual--lit" role="img" aria-label="A tela de perfil do atleta Miguel Santos: centroavante Sub-15 de Campinas, com altura, peso, idade e os vídeos dele"><div class="ph-stage"><div class="ph"><div class="ph__screen"><div class="ph__top"><span><small>Seu perfil</small><strong>Miguel Santos</strong></span></div><div class="ph__body"><div class="ph-card ph-hero"><span class="ph-av ph-av--lg">MS</span><span><b>Centroavante</b><br><small>Sub-15 · Campinas, SP</small></span></div><div class="ph-stats"><span><small>Altura</small><b>1,68 m</b></span><span><small>Peso</small><b>58 kg</b></span><span><small>Idade</small><b>14</b></span></div><div class="ph-card"><small>Meus vídeos</small><div class="ph-thumbs"><i></i><i></i><i></i></div></div><span class="ph-btn ph-btn--outline">Editar perfil</span></div><div class="ph__tabs" aria-hidden="true"><span>Início</span><span>Peneiras</span><span class="rec"><svg viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"><rect x="1.5" y="4" width="9" height="8" rx="1.5"/><path d="m10.5 7 4-2.2v6.4l-4-2.2z"/></svg></span><span>Mensagens</span><span class="on">Perfil</span></div></div></div></div></figure>
+          </li>
+          <li class="mo-pc__step">
+            <h3>Publique seus lances</h3>
+            <p>Escolha o vídeo, marque o fundamento e toque em Publicar. O olheiro vê como você joga, não só seus números.</p>
+            <figure class="mo-pc__visual mo-pc__visual--lit" role="img" aria-label="A tela de novo vídeo: um lance de 42 segundos marcado como finalização, com a legenda e o botão Publicar"><div class="ph-stage"><div class="ph"><div class="ph__screen"><div class="ph__top"><span><small>Publicar</small><strong>Novo vídeo</strong></span></div><div class="ph__body"><div class="ph-video"><span><svg viewBox="0 0 12 12" fill="#0B0F14"><path d="M3 1.8v8.4L10 6z"/></svg></span><small>0:42</small></div><div class="ph-field"><small>Fundamento</small><div class="ph-chips"><span class="on">Finalização</span><span>Drible</span><span>Passe</span><span>Defesa</span></div></div><div class="ph-field"><small>Legenda (opcional)</small><span class="ph-input">Treino de finalização de curta distância</span></div><span class="ph-btn">Publicar</span></div><div class="ph__tabs" aria-hidden="true"><span>Início</span><span>Peneiras</span><span class="rec"><svg viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"><rect x="1.5" y="4" width="9" height="8" rx="1.5"/><path d="m10.5 7 4-2.2v6.4l-4-2.2z"/></svg></span><span>Mensagens</span><span>Perfil</span></div></div></div></div></figure>
+          </li>
+          <li class="mo-pc__step">
+            <h3>Inscreva-se nas peneiras</h3>
+            <p>Encontre a peneira pela cidade, categoria ou posição e toque em Quero participar. O clube vê você na lista de inscritos.</p>
+            <figure class="mo-pc__visual mo-pc__visual--lit" role="img" aria-label="A aba de peneiras: a peneira do EC Jardim com o botão Quero participar e outra peneira já com o selo Inscrito"><div class="ph-stage"><div class="ph"><div class="ph__screen"><div class="ph__top"><span><small>Sub-15 · Campinas</small><strong>Peneiras</strong></span></div><div class="ph__body"><div class="ph-card"><div class="ph-who"><span class="ph-av ph-av--club">EC</span><span><b>Peneira EC Jardim</b><br><small>Sáb, 14 dez · 08:00</small></span></div><small>Sub-15 · atacantes e laterais · 12 vagas</small><span class="ph-btn">Quero participar</span></div><div class="ph-card"><div class="ph-who"><span class="ph-av">AS</span><span><b>Peneira Atlético Serrano</b><br><small>Dom, 15 dez · 09:00</small></span><span class="ph-badge">Inscrito</span></div></div><div class="ph-card"><div class="ph-who"><span class="ph-av">UC</span><span><b>Peneira União Campineira</b><br><small>Sáb, 21 dez · 08:30</small></span></div></div></div><div class="ph__tabs" aria-hidden="true"><span>Início</span><span class="on">Peneiras</span><span class="rec"><svg viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"><rect x="1.5" y="4" width="9" height="8" rx="1.5"/><path d="m10.5 7 4-2.2v6.4l-4-2.2z"/></svg></span><span>Mensagens</span><span>Perfil</span></div></div></div></div></figure>
+          </li>
+          <li class="mo-pc__step">
+            <h3>O clube fala com você</h3>
+            <p>Olheiros de clubes aprovados mandam mensagem pelo app. Menores de 18 anos conversam só com a autorização do responsável.</p>
+            <figure class="mo-pc__visual mo-pc__visual--lit" role="img" aria-label="Uma conversa entre o EC Jardim e o atleta, combinando o que levar na peneira de sábado"><div class="ph-stage"><div class="ph"><div class="ph__screen"><div class="ph__top"><span><small>Conversa</small><strong>EC Jardim</strong></span></div><div class="ph__body"><div class="ph-msg">Vimos seu vídeo de finalização. Você vem na peneira de sábado?</div><div class="ph-msg ph-msg--me">Vou sim! Preciso levar alguma coisa?</div><div class="ph-msg">Chuteira, caneleira e o documento. Leve também o atestado médico.</div><div class="ph-msg ph-msg--me">Combinado, até sábado.</div></div><div class="ph__tabs" aria-hidden="true"><span>Início</span><span>Peneiras</span><span class="rec"><svg viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"><rect x="1.5" y="4" width="9" height="8" rx="1.5"/><path d="m10.5 7 4-2.2v6.4l-4-2.2z"/></svg></span><span class="on">Mensagens</span><span>Perfil</span></div></div></div></div></figure>
+          </li>
+        </ol>
+      </div>
+      <div class="mo-pc__visuals frame"></div>
+    </div>
+  </section>
+
+  <section class="section" id="peneiras" aria-labelledby="peneiras-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 id="peneiras-h" class="span-6">Todos os inscritos da peneira em uma tela</h2>
+        <p class="span-6 start-7">O clube ou olheiro publica a peneira, vê cada inscrito com posição, idade e cidade, abre o vídeo e conversa com o jogador ali mesmo.</p>
+      </div>
+      <div class="ui app fill" role="img" aria-label="A tela do clube no Rise Eleven: a lista de inscritos da peneira Sub-15 ao lado da conversa com o jogador Miguel Santos" data-ui-pause-host>
+        <div class="app__pane app__pane--list">
+          <div class="ui ui-panel ui-win" data-ui="window" data-open="Nova" data-work="Vendo vídeo" data-done="Favorito">
+            <div class="ui-win__bar">
+              <span class="ui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="ui-win__crumb"><svg class="ui-brand" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 13a5 5 0 0 1 10 0"/></svg>Peneiras <i>/</i> <b>Sub-15</b></span>
+              <span class="ui-spacer"></span>
+              <span class="ui-win__search" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg><span class="ui-win__ph">Buscar</span><span class="ui-kbd">/</span></span>
+            </div>
+            <div class="ui-win__body">
+              <nav class="ui-win__side" aria-hidden="true">
+                <span class="ui-win__nav is-on"><svg class="ui-icon" viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M3.5 13.5c.6-2.3 2.4-3.5 4.5-3.5s3.9 1.2 4.5 3.5"/></svg>Inscritos<em>22</em></span>
+                <span class="ui-win__nav"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M8 13.2 3.2 8.6a2.9 2.9 0 0 1 4.8-3.2 2.9 2.9 0 0 1 4.8 3.2z"/></svg>Favoritos<em>6</em></span>
+                <span class="ui-win__nav"><svg class="ui-icon" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>Aguardando<em>3</em></span>
+                <span class="ui-win__nav"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M2.5 4.5h11v8h-11z"/><path d="m2.5 5 5.5 4 5.5-4"/></svg>Mensagens</span>
+                <span class="ui-win__label">Peneiras</span>
+                <span class="ui-win__nav"><span class="ui-win__hash">#</span>Sub-15</span>
+                <span class="ui-win__nav"><span class="ui-win__hash">#</span>Sub-17</span>
+              </nav>
+              <div class="ui-win__main">
+                <div class="ui-win__cols" aria-hidden="true"><span>Jogador</span><span>Posição</span><span>Status</span><span>Há</span></div>
+                <ul class="ui-win__rows">
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="1">MS</span><span class="ui-win__who">Miguel Santos</span><span class="ui-win__sub">Atacante · 14 anos · Campinas</span><span class="ui-win__st" data-st>Nova</span><span class="ui-win__age">2 min</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="3">JP</span><span class="ui-win__who">João Pedro Lima</span><span class="ui-win__sub">Lateral · 15 anos · Sumaré</span><span class="ui-win__st" data-st>Nova</span><span class="ui-win__age">9 min</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="4">GA</span><span class="ui-win__who">Gabriel Alves</span><span class="ui-win__sub">Atacante · 14 anos · Hortolândia</span><span class="ui-win__st" data-st>Nova</span><span class="ui-win__age">16 min</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="2">RC</span><span class="ui-win__who">Rafael Costa</span><span class="ui-win__sub">Lateral · 15 anos · Campinas</span><span class="ui-win__st is-you" data-st>Aguardando</span><span class="ui-win__age">24 min</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="5">LO</span><span class="ui-win__who">Lucas Oliveira</span><span class="ui-win__sub">Atacante · 15 anos · Valinhos</span><span class="ui-win__st is-done" data-st>Favorito</span><span class="ui-win__age">41 min</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="3">TF</span><span class="ui-win__who">Thiago Ferreira</span><span class="ui-win__sub">Lateral · 14 anos · Paulínia</span><span class="ui-win__st is-done" data-st>Favorito</span><span class="ui-win__age">1 h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="1">BR</span><span class="ui-win__who">Bruno Ribeiro</span><span class="ui-win__sub">Atacante · 15 anos · Indaiatuba</span><span class="ui-win__st" data-st>Nova</span><span class="ui-win__age">1 h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="4">EM</span><span class="ui-win__who">Enzo Martins</span><span class="ui-win__sub">Lateral · 14 anos · Americana</span><span class="ui-win__st is-you" data-st>Aguardando</span><span class="ui-win__age">2 h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="2">DS</span><span class="ui-win__who">Davi Souza</span><span class="ui-win__sub">Atacante · 15 anos · Campinas</span><span class="ui-win__st is-done" data-st>Favorito</span><span class="ui-win__age">3 h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="5">HC</span><span class="ui-win__who">Heitor Carvalho</span><span class="ui-win__sub">Lateral · 15 anos · Jundiaí</span><span class="ui-win__st" data-st>Nova</span><span class="ui-win__age">4 h</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app__pane app__pane--open" data-ui-loop>
+          <div class="ui ui-panel ui-chat" data-ui="chat">
+            <div class="ui-head">
+              <span class="ui-avatar" data-tone="1" aria-hidden="true">MS</span>
+              <div class="ui-title">Miguel Santos · Sub-15</div>
+              <span class="ui-chat__online">Responsável confirmado</span>
+              <span class="ui-spacer"></span>
+            </div>
+            <div class="ui-chat__body">
+              <div class="ui-chat__day">Hoje, 9:41</div>
+              <div class="ui-msg ui-msg--me"><span class="ui-msg__text">Oi, Miguel. Vimos seu vídeo do gol de falta. Você consegue vir à peneira de sábado?</span></div>
+              <div class="ui-msg ui-msg--me" data-chat-q><span class="ui-msg__text">É no campo do clube, às 8h. Precisa de algo para confirmar?</span></div>
+              <div class="ui-msg ui-msg--bot" data-chat-a>
+                <span class="ui-avatar ui-msg__av" data-tone="1" aria-hidden="true">MS</span>
+                <span class="ui-msg__col">
+                  <span class="ui-chat__typing" aria-hidden="true"><i></i><i></i><i></i></span>
+                  <span class="ui-chat__answer">Consigo, sim. Minha mãe, <b>Carla Santos</b>, já autorizou pelo app. Levo chuteira de campo e RG.</span>
+                  <span class="ui-chat__srcs">
+                    <span class="ui-chat__src"><svg class="ui-icon" viewBox="0 0 16 16"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg>Autorização do responsável</span>
+                    <span class="ui-chat__src"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M3 3.5h10v9H3z"/><path d="M3 6.5h10M6 2v3M10 2v3"/></svg>Peneira Sub-15, 14 dez</span>
+                  </span>
+                </span>
+              </div>
+              <div class="ui-msg ui-msg--me"><span class="ui-msg__text">Perfeito. Leve também atestado médico. Te esperamos às 8h.</span></div>
+              <div class="ui-msg ui-msg--bot">
+                <span class="ui-avatar ui-msg__av" data-tone="1" aria-hidden="true">MS</span>
+                <span class="ui-msg__col"><span class="ui-chat__answer">Combinado. Obrigado pela chance.</span></span>
+              </div>
+              <div class="ui-msg ui-msg--me"><span class="ui-msg__text">Endereço e horário já estão na página da peneira.</span></div>
+            </div>
+            <div class="ui-chat__input">
+              <span class="ui-chat__ph">Escreva uma mensagem</span>
+              <span class="ui-chat__send" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 13V3.5M3.8 7.5 8 3.3l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="perguntas" style="--hm: 2" aria-labelledby="perguntas-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-6 stack-4">
+          <h2 id="perguntas-h">Perguntas sobre o Rise Eleven</h2>
+          <p>O que jogadores, responsáveis e clubes mais querem saber antes do lançamento.</p>
+        </div>
+        <div class="faq span-6 start-7">
+          <div class="faq__item"><h3>Quando o app vai lançar?</h3><p>Já dá para usar no navegador, no celular ou no computador. Os apps para iPhone e Android vêm em seguida.</p></div>
+          <div class="faq__item"><h3>Menores de 18 anos podem usar?</h3><p>Sim, com autorização do responsável legal. Ele recebe um código de 6 dígitos por e-mail; até confirmar, o perfil fica fora da busca e não troca mensagens.</p></div>
+          <div class="faq__item"><h3>Como me inscrevo numa peneira?</h3><p>Monte seu perfil, encontre a peneira pela cidade, categoria ou posição e toque em Inscrever-se. O clube vê sua inscrição na lista de inscritos.</p></div>
+          <div class="faq__item"><h3>Quanto custa o Rise Eleven?</h3><p>Nada. No lançamento o app é grátis para jogadores, responsáveis, clubes e olheiros.</p></div>
+          <div class="faq__item"><h3>Como sei que uma peneira é real?</h3><p>Clubes e organizadores que publicam peneiras passam por verificação, e cada peneira verificada mostra o selo do clube.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section g2" id="recursos" aria-labelledby="recursos-h">
+    <div class="wrap">
+      <div class="group">
+        <div class="section-head">
+          <h2 id="recursos-h">Do perfil à peneira. <span class="muted">Tudo o que o jogador precisa para ser visto.</span></h2>
+        </div>
+        <div class="grid">
+          <article class="card card--row card--open span-6 m-nolift">
+            <h3>Encontra peneiras perto de casa</h3>
+            <p>Busque por cidade, categoria ou posição e veja data, endereço e vagas restantes.</p>
+            <div class="panel">
+              <div class="stage stage--fade-b"><div class="at-rise fit to-edge" style="--fit-max:380px;--ax:max(24px, 50% - 190px);--ay:56px;--ay-sm:56px" data-ui-loop>
+                <div class="ui ui-panel ui-search" data-ui="search">
+                  <div class="ui-search__field">
+                    <svg class="ui-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
+                    <span class="ui-search__q"><span data-search-q>peneira sub-15 campinas</span><i class="ui-search__caret"></i></span>
+                  </div>
+                  <div class="ui-search__group">Peneiras</div>
+                  <ul class="ui-search__list" data-search-list>
+                    <li class="ui-search__row is-sel"><span class="ui-search__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M3 3.5h10v9H3z"/><path d="M3 6.5h10M6 2v3M10 2v3"/></svg></span><span class="ui-search__t"><b>Sub-15</b> em <b>Campinas</b></span><span class="ui-search__m">14 dez</span></li>
+                    <li class="ui-search__row"><span class="ui-search__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M3 3.5h10v9H3z"/><path d="M3 6.5h10M6 2v3M10 2v3"/></svg></span><span class="ui-search__t"><b>Sub-15</b> em Sumaré</span><span class="ui-search__m">21 dez</span></li>
+                    <li class="ui-search__row"><span class="ui-search__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M3 3.5h10v9H3z"/><path d="M3 6.5h10M6 2v3M10 2v3"/></svg></span><span class="ui-search__t"><b>Sub-15</b> em Valinhos</span><span class="ui-search__m">11 jan</span></li>
+                  </ul>
+                  <div class="ui-search__foot"><span>3 peneiras a menos de 40 km</span></div>
+                </div>
+              </div></div>
+            </div>
+          </article>
+          <article class="card card--row card--open span-6 m-nolift">
+            <h3>Avisa quando um clube se interessa</h3>
+            <p>Um favorito ou uma mensagem de clube chega na hora, com o nome do clube e da peneira.</p>
+            <div class="panel">
+              <div class="stage stage--fade-b"><div class="at-rise fit" style="--fit-max:380px;--ax:32px;--ay:calc(100% - 180px);--ay-sm:calc(100% - 180px)">
+                <div class="ui ui-notify" data-ui="notify">
+                  <ul class="ui-notify__list" data-notify-list>
+                    <li class="ui-note"><span class="ui-avatar ui-note__av" data-tone="2">EC</span><span class="ui-note__text"><span class="ui-note__title">EC Jardim favoritou você<time>agora</time></span><span class="ui-note__body">Depois de ver seu vídeo de jogadas</span></span></li>
+                    <li class="ui-note"><span class="ui-avatar ui-note__av" data-tone="4">AV</span><span class="ui-note__text"><span class="ui-note__title">Nova mensagem do AA Vila<time>12 min</time></span><span class="ui-note__body">Sobre a peneira Sub-15 de sábado</span></span></li>
+                    <li class="ui-note"><span class="ui-note__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg></span><span class="ui-note__text"><span class="ui-note__title">Inscrição confirmada<time>1 h</time></span><span class="ui-note__body">Peneira Sub-15, 14 dez, Campinas</span></span></li>
+                  </ul>
+                </div>
+              </div></div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card card--row card--open span-6 m-nolift">
+          <h3>Monta o perfil do jogador</h3>
+          <p>Posição, altura, cidade e os vídeos das melhores jogadas, num perfil que os clubes encontram.</p>
+          <div class="panel">
+            <div class="stage stage--fade-b"><div class="at-rise fit" style="--fit-max:340px;--ax:max(24px, 50% - 170px);--ay:40px;--ay-sm:40px">
+              <div class="ui ui-panel ui-checks" data-ui="checklist">
+                <div class="ui-checks__head">
+                  <div class="ui-title">Perfil de Miguel Santos</div>
+                  <span class="ui-spacer"></span>
+                  <div class="ui-meta" data-checks-count>3 de 5</div>
+                </div>
+                <div class="ui-checks__bar"><i data-checks-bar style="--k:0.6"></i></div>
+                <ul class="ui-checks__list">
+                  <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Posição e pé dominante</span></li>
+                  <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Altura e peso</span></li>
+                  <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Cidade e estado</span></li>
+                  <li class="ui-check"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Vídeo de jogadas</span></li>
+                  <li class="ui-check"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Autorização do responsável</span></li>
+                </ul>
+              </div>
+            </div></div>
+          </div>
+        </article>
+        <article class="card card--row card--open span-6 m-nolift" id="seguranca">
+          <h3>Protege jogadores menores de idade</h3>
+          <p>O responsável confirma por um código no e-mail. Antes disso, o perfil fica oculto e sem mensagens.</p>
+          <div class="panel">
+            <div class="stage stage--fade-b"><div class="at-right to-edge" style="--ax:32px;--ay:56px;--ay-sm:56px">
+              <div class="ui ui-panel ui-toggles" data-ui="toggles">
+                <div class="ui-head">
+                  <svg class="ui-icon ui-toggles__ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8 13 4v3.6c0 3-2.1 5.4-5 6.6-2.9-1.2-5-3.6-5-6.6V4z"/><path d="m5.8 8 1.6 1.6 3-3.2"/></svg>
+                  <div class="ui-title">Regras para menores de 18</div>
+                  <span class="ui-spacer"></span>
+                  <div class="ui-meta" data-tg-count>4 ativas</div>
+                </div>
+                <ul class="ui-toggles__list">
+                  <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Perfil oculto até a confirmação</span><span class="ui-tg__sub">Clubes não encontram na busca</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Perfil oculto até a confirmação" tabindex="-1"><i></i></button></li>
+                  <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Mensagens só depois da confirmação</span><span class="ui-tg__sub">Nada entra nem sai antes</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Mensagens só depois da confirmação" tabindex="-1"><i></i></button></li>
+                  <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Código vale por 24 horas</span><span class="ui-tg__sub">Até 5 tentativas</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Código vale por 24 horas" tabindex="-1"><i></i></button></li>
+                  <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Denúncia de conversa</span><span class="ui-tg__sub">Em qualquer conversa com clube</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Denúncia de conversa" tabindex="-1"><i></i></button></li>
+                </ul>
+              </div>
+            </div></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer closing footer--statement" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head--split">
+        <div><h2 id="close-h">Use o Rise Eleven no navegador</h2><p class="t-lead">Crie sua conta de jogador ou de clube agora. Os apps para iPhone e Android vêm em seguida.</p></div>
+        <a class="btn btn--primary" href="https://rise-eleven.expo.app">Abrir o app<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+      </div>
+      <p class="close__word" aria-hidden="true">RISE<b>11</b></p>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-6 stack-4">
+          <a class="nav__logo" href="#top"><span class="wordmark" aria-label="Rise Eleven">RISE<b>11</b></span></a>
+          <p class="footer__lede">Peneiras, olheiros e perfis de jogadores para o futebol de base.</p>
+        </div>
+        <div class="span-3 start-7 footer__col"><h4>Produto</h4><ul><li><a href="#peneiras">Peneiras</a></li><li><a href="#recursos">Recursos</a></li></ul></div>
+        <div class="span-3 footer__col"><h4>Ajuda</h4><ul><li><a href="#seguranca">Segurança</a></li><li><a href="#perguntas">Perguntas</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Rise Eleven</span>
+        <div class="socials"></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
+</body>
+</html>
